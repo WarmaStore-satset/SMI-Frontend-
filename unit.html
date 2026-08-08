@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Unit - SMI Kota Serang</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', sans-serif; }
+        body { background:#f4f4f9; color:#333; }
+        .btn-back { display:inline-block; margin:15px; padding:8px 15px; background:#cc0000; color:white; text-decoration:none; border-radius:5px; font-weight:bold; font-size:0.85rem; }
+        .hero-detail {
+            position:relative; background-size:cover; background-position:center; color:white; text-align:center; padding:80px 20px;
+        }
+        .hero-detail h2 { font-size:1rem; color:#ffcccc; text-transform:uppercase; letter-spacing:1px; }
+        .hero-detail h1 { font-size:1.8rem; text-transform:uppercase; margin-top:5px; }
+        .container { padding:20px; max-width:500px; margin:0 auto; }
+        .card { background:white; padding:20px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1); margin-bottom:20px; }
+        .item { margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid #eee; }
+        .label { font-size:0.75rem; color:#888; text-transform:uppercase; font-weight:bold; }
+        .value { font-size:0.95rem; font-weight:600; color:#333; }
+        .btn-wa { display:block; background:#25D366; color:white; text-align:center; padding:12px; border-radius:6px; font-weight:bold; text-decoration:none; font-size:1rem; }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="btn-back">⬅ Kembali</a>
+
+    <div id="content">
+        <p style="text-align:center; padding:20px;">Memuat detail unit...</p>
+    </div>
+
+    <script>
+        const PROJECT_ID = 'r6yz1q11';
+        const DATASET = 'production';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const slug = urlParams.get('slug');
+
+        async function fetchDetail() {
+            if(!slug) return;
+            const query = encodeURIComponent(`*[_type == "unit" && slug.current == "${slug}"][0]{
+            namaSekolah,
+            tahunAktif,
+            pelatih,
+            jadwal,
+            lokasi,
+            waPelatih,
+            "bgUrl": banner.asset->url
+            }`);
+
+            try {
+                const res = await fetch(`https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${query}`);
+                const data = await res.json();
+                const u = data.result;
+
+                if (!u) {
+                    document.getElementById('content').innerHTML = '<p style="text-align:center; padding:20px;">Data unit tidak ditemukan.</p>';
+                    return;
+                }
+
+                const bg = u.bgUrl || 'https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=1000';
+
+                document.getElementById('content').innerHTML = `
+                    <header class="hero-detail" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.7)), url('${bg}');">
+                        <h2>Satria Muda Indonesia</h2>
+                        <h1>${u.namaSekolah}</h1>
+                    </header>
+                    <main class="container">
+                        <div class="card">
+                            <div class="item"><p class="label">Aktif Sejak</p><p class="value">${u.tahunAktif || '-'}</p></div>
+                            <div class="item"><p class="label">Pelatih Utama</p><p class="value">${u.pelatih || '-'}</p></div>
+                            <div class="item"><p class="label">Jadwal Latihan</p><p class="value">${u.jadwal || '-'}</p></div>
+                            <div class="item"><p class="label">Lokasi Latihan</p><p class="value">${u.lokasi || '-'}</p></div>
+                        </div>
+                        ${u.waPelatih ? `<a href="https://wa.me/${u.waPelatih}" target="_blank" class="btn-wa">📞 Kontak Pelatih</a>` : ''}
+                    </main>
+                `;
+            } catch(e) {
+                document.getElementById('content').innerHTML = '<p style="text-align:center;">Gagal memuat detail unit.</p>';
+            }
+        }
+
+        fetchDetail();
+    </script>
+</body>
+</html>
