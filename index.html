@@ -347,113 +347,117 @@
             }
         }
 
-        /* ================= BANNER CAROUSEL / SLIDER ================= */
-        .carousel-container-box {
-            position: relative;
-            width: 100%;
-            max-width: 900px;
-            margin: 0 auto;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            background: #000;
-            margin-bottom: 20px;
-        }
+/* ================= BANNER CAROUSEL / SLIDER ================= */
+.carousel-container-box {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    background: #000;
+    margin-bottom: 20px;
+}
 
-        .carousel-track {
-            display: flex;
-            transition: transform 0.5s ease-in-out;
-            width: 100%;
-        }
+.carousel-track {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    width: 100%;
+}
 
-        .carousel-slide {
-            min-width: 100%;
-            height: 220px; /* Tinggi landscape pas untuk HP */
-            position: relative;
-        }
+.carousel-slide {
+    min-width: 100%;
+    height: 220px; /* Tinggi landscape pas untuk HP */
+    position: relative;
+}
 
-        @media (min-width: 768px) {
-            .carousel-slide {
-                height: 350px; /* Tinggi landscape untuk Laptop/Desktop */
-            }
-        }
+@media (min-width: 768px) {
+    .carousel-slide {
+        height: 350px; /* Tinggi landscape untuk Laptop/Desktop */
+    }
+}
 
-        .carousel-slide img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: brightness(0.75); /* Biar teks di atasnya keliatan kontras */
-        }
+.carousel-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.75); /* Biar teks di atasnya keliatan kontras */
+}
 
-        .carousel-caption {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 20px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.8));
-            color: white;
-        }
+.carousel-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    padding-right: 90px; /* DITAMBAHKAN: Biar judul teks ga nimpah/numpuk sama dots di pojok kanan */
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    color: white;
+}
 
-        .carousel-caption h3 {
-            font-size: 0.95rem;
-            font-weight: 600;
-        }
+.carousel-caption h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0;
+}
 
-        @media (min-width: 768px) {
-            .carousel-caption h3 {
-                font-size: 1.2rem;
-            }
-        }
+@media (min-width: 768px) {
+    .carousel-caption h3 {
+        font-size: 1.2rem;
+    }
+}
 
-        .carousel-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(0,0,0,0.4);
-            color: white;
-            border: none;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.3s;
-            z-index: 10;
-        }
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.4);
+    color: white;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+    z-index: 10;
+}
 
-        .carousel-btn:hover {
-            background: #cc0000;
-        }
+.carousel-btn:hover {
+    background: #cc0000;
+}
 
-        .prev-btn { left: 10px; }
-        .next-btn { right: 10px; }
+.prev-btn { left: 10px; }
+.next-btn { right: 10px; }
 
-        .carousel-dots {
-            position: absolute;
-            bottom: 12px;
-            right: 15px;
-            display: flex;
-            gap: 6px;
-            z-index: 10;
-        }
+/* Indikator Dots Posisi Bawah Kanan */
+.carousel-dots {
+    position: absolute;
+    bottom: 12px;
+    right: 15px; /* Posisi kanan bawah */
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 10;
+}
 
-        .dot {
-            width: 8px;
-            height: 8px;
-            background: rgba(255,255,255,0.5);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+.dot {
+    width: 8px;
+    height: 8px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
 
-        .dot.active {
-            background: #cc0000;
-            width: 22px;
-            border-radius: 4px;
-        }
+.dot.active {
+    background: #cc0000;
+    width: 22px;
+    border-radius: 4px;
+}
 
     </style>
 </head>
