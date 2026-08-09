@@ -786,10 +786,10 @@
         const PROJECT_ID = 'r6yz1q11';
         const DATASET = 'production';
         
-        // Query GROQ untuk mengambil semua data dari schema 'banner'
+        // Query GROQ disesuaikan dengan field "title" dan "image"
         const GROQ_QUERY = encodeURIComponent(`*[_type == "banner"]{
-            judul,
-            "imageUrl": fotoBanner.asset->url
+            title,
+            "imageUrl": image.asset->url
         }`);
 
         const url = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${GROQ_QUERY}`;
@@ -805,7 +805,7 @@
                 track.innerHTML = `
                     <div class="carousel-slide">
                         <div class="carousel-caption">
-                            <h3>Belum ada banner tersedia</h3>
+                            <h3>Belum ada banner</h3>
                         </div>
                     </div>`;
                 return;
@@ -814,14 +814,14 @@
             // Render ulang slide berdasarkan data dari Sanity
             track.innerHTML = banners.map(b => `
                 <div class="carousel-slide">
-                    <img src="${b.imageUrl}" alt="${b.judul || 'Banner SMI'}">
+                    <img src="${b.imageUrl}" alt="${b.title || 'Banner SMI'}">
                     <div class="carousel-caption">
-                        <h3>${b.judul || ''}</h3>
+                        <h3>${b.title || ''}</h3>
                     </div>
                 </div>
             `).join('');
 
-            // Inisialisasi ulang fungsi/slider animasi carousel kamu jika ada
+            // Panggil kembali fungsi animasi carousel lama (jika ada)
             if (typeof initCarouselAnimation === 'function') {
                 initCarouselAnimation();
             }
@@ -831,9 +831,10 @@
         }
     }
 
-    // Jalankan fungsi saat halaman selesai di-load
+    // Jalankan saat halaman selesai dimuat
     document.addEventListener('DOMContentLoaded', loadSanityBanners);
-    
+</script>
+
     </script>
 </body>
 </html>
