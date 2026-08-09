@@ -478,10 +478,10 @@
         <p>Komwil Kota Serang</p>
     </header>
 
-<!-- BANNER CAROUSEL -->
+<!-- BANNER CAROUSEL (BERSIH & TERORGANISIR) -->
 <section class="section" style="padding-bottom: 10px;">
     <div class="carousel-container-box">
-        <!-- Track Gambar -->
+        <!-- Track Tempat Gambar Slide -->
         <div id="carousel-track" class="carousel-track">
             <div class="carousel-slide">
                 <div class="carousel-caption">
@@ -490,7 +490,7 @@
             </div>
         </div>
 
-        <!-- Tombol Panah (Di dalam box) -->
+        <!-- Navigation Buttons -->
         <button class="carousel-btn prev-btn" onclick="moveSlide(-1)">
             <i class="fa-solid fa-chevron-left"></i>
         </button>
@@ -498,23 +498,10 @@
             <i class="fa-solid fa-chevron-right"></i>
         </button>
 
-        <!-- Container Dots (Akan diisi otomatis oleh JS) -->
+        <!-- Dynamic Dots Container -->
         <div id="carousel-dots" class="carousel-dots"></div>
     </div>
 </section>
-
-            <!-- Tombol Panah Kiri & Kanan (Manual) -->
-            <button class="carousel-btn prev-btn" onclick="moveSlide(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-            <button class="carousel-btn next-btn" onclick="moveSlide(1)"><i class="fa-solid fa-chevron-right"></i></button>
-
-            <!-- Indikator Titik -->
-            <div class="carousel-dots">
-                <span class="dot active" onclick="currentSlide(0)"></span>
-                <span class="dot" onclick="currentSlide(1)"></span>
-                <span class="dot" onclick="currentSlide(2)"></span>
-            </div>
-        </div>
-    </section>
 
     <section id="profil" class="section" style="overflow: hidden;">
         <!-- ANIMASI KIRI KE KANAN -->
@@ -600,259 +587,258 @@
             © 2026 SMI Komwil Kota Serang. All Rights Reserved.
         </div>
     </footer>
-    <script>
-        const PROJECT_ID = 'r6yz1q11';
-        const DATASET = 'production';
+<script>
+    const PROJECT_ID = 'r6yz1q11';
+    const DATASET = 'production';
 
-        let autoScrollInterval = null;
-        let slideIndex = 0;
-        let autoSlideTimer = null;
+    let autoScrollInterval = null;
+    let slideIndex = 0;
+    let autoSlideTimer = null;
 
-        function toggleMenu() {
-            document.getElementById('navMenu').classList.toggle('active');
-        }
+    function toggleMenu() {
+        document.getElementById('navMenu').classList.toggle('active');
+    }
 
-        // FUNGSI PENGGERAK ANIMASI SCROLL
-        function initScrollObserver() {
-            const animatedElements = document.querySelectorAll('.anim-left, .anim-right, .anim-up');
+    // ================= FUNGSI PENGGERAK ANIMASI SCROLL ================= //
+    function initScrollObserver() {
+        const animatedElements = document.querySelectorAll('.anim-left, .anim-right, .anim-up');
 
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('anim-show');
-                    }
-                });
-            }, {
-                threshold: 0.15
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('anim-show');
+                }
             });
-
-            animatedElements.forEach(el => observer.observe(el));
-        }
-
-        // ================= LOGIKA BANNER CAROUSEL ================= //
-        function showSlide(index) {
-            const track = document.getElementById('carousel-track');
-            const slides = document.querySelectorAll('.carousel-slide');
-            const dots = document.querySelectorAll('.dot');
-
-            if (!track || slides.length === 0) return;
-
-            if (index >= slides.length) slideIndex = 0;
-            if (index < 0) slideIndex = slides.length - 1;
-
-            track.style.transform = `translateX(-${slideIndex * 100}%)`;
-
-            dots.forEach((dot, i) => {
-                dot.classList.toggle('active', i === slideIndex);
-            });
-        }
-
-        function moveSlide(n) {
-            slideIndex += n;
-            showSlide(slideIndex);
-            resetAutoSlide();
-        }
-
-        function currentSlide(n) {
-            slideIndex = n;
-            showSlide(slideIndex);
-            resetAutoSlide();
-        }
-
-        function startAutoSlide() {
-            autoSlideTimer = setInterval(() => {
-                slideIndex++;
-                showSlide(slideIndex);
-            }, 4000);
-        }
-
-        function resetAutoSlide() {
-            clearInterval(autoSlideTimer);
-            startAutoSlide();
-        }
-
-        // ================= FETCH DATA UNIT ================= //
-        async function fetchUnit() {
-            const query = encodeURIComponent(`*[_type == "unit"]{namaSekolah, "slug": slug.current, tingkat}`);
-            const url = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${query}`;
-
-            try {
-                const res = await fetch(url);
-                const data = await res.json();
-                const units = data.result || [];
-
-                const loadingEl = document.getElementById('loading-unit');
-                if(loadingEl) loadingEl.style.display = 'none';
-
-                const container = document.getElementById('unit-container');
-
-                if (units.length === 0) {
-                    container.innerHTML = '<p style="text-align:center; color:#777;">Belum ada data unit. Isi via Dashboard Sanity.</p>';
-                    return;
-                }
-
-                const dikelompokkan = {};
-                units.forEach(u => {
-                    const tingkatKey = u.tingkat || 'Umum';
-                    if(!dikelompokkan[tingkatKey]) dikelompokkan[tingkatKey] = [];
-                    dikelompokkan[tingkatKey].push(u);
-                });
-
-                const urutanTingkat = ['SD', 'SMP', 'SMA', 'Umum'];
-
-                urutanTingkat.forEach(tingkat => {
-                    const list = dikelompokkan[tingkat];
-                    if (!list) return;
-
-                    const groupDiv = document.createElement('div');
-                    groupDiv.className = 'unit-group anim-up';
-                    groupDiv.innerHTML = `
-                        <h3>Tingkat ${tingkat}</h3>
-                        <ul class="unit-list">
-                            ${list.map(item => `
-                                <li>
-                                    <a href="unit.html?slug=${item.slug}">
-                                        📍 ${item.namaSekolah}
-                                    </a>
-                                </li>
-                            `).join('')}
-                        </ul>
-                    `;
-                    container.appendChild(groupDiv);
-                });
-
-                // Re-init observer untuk element unit yang baru dibuat
-                initScrollObserver();
-
-            } catch (e) {
-                const loadingEl = document.getElementById('loading-unit');
-                if(loadingEl) loadingEl.innerText = 'Gagal memuat data unit.';
-            }
-        }
-
-        // ================= FETCH DATA PRESTASI ================= //
-        async function fetchPrestasi() {
-            const query = encodeURIComponent(`*[_type == "prestasi"] | order(_createdAt desc)[0...10]{
-                namaAtlet,
-                kejuaraan,
-                asalUnit,
-                "fotoUrl": fotoAtlet.asset->url
-            }`);
-
-            const url = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${query}`;
-
-            try {
-                const res = await fetch(url);
-                const data = await res.json();
-                const prestasis = data.result || [];
-
-                const container = document.getElementById('prestasi-container');
-
-                if (prestasis.length === 0) {
-                    container.innerHTML = '<p style="text-align:center; width:100%; color:#777;">Belum ada data prestasi.</p>';
-                    return;
-                }
-
-                const cardsHTML = prestasis.map(p => `
-                    <div class="card-prestasi">
-                        <img src="${p.fotoUrl || 'https://via.placeholder.com/150'}" alt="${p.namaAtlet}">
-                        <div class="card-info">
-                            <h4>${p.namaAtlet}</h4>
-                            <p>${p.kejuaraan}</p>
-                            <p class="unit-tag">📍 ${p.asalUnit || '-'}</p>
-                        </div>
-                    </div>
-                `).join('');
-
-                container.innerHTML = cardsHTML + cardsHTML + cardsHTML;
-
-                startAutoScroll(container);
-
-            } catch (e) {
-                document.getElementById('prestasi-container').innerHTML =
-                    '<p style="text-align:center; width:100%;">Gagal memuat prestasi.</p>';
-                console.error(e);
-            }
-        }
-
-        function startAutoScroll(container) {
-            if (autoScrollInterval) clearInterval(autoScrollInterval);
-
-            const speed = 1;
-
-            autoScrollInterval = setInterval(() => {
-                container.scrollLeft += speed;
-
-                if (container.scrollLeft >= (container.scrollWidth / 3) * 2) {
-                    container.scrollLeft = container.scrollLeft - (container.scrollWidth / 3);
-                }
-            }, 20);
-        }
-
-        // ================= JALANKAN SAAT DOM READY ================= //
-        document.addEventListener('DOMContentLoaded', () => {
-            initScrollObserver();
-            startAutoSlide();
-            fetchUnit();
-            fetchPrestasi();
+        }, {
+            threshold: 0.15
         });
 
-async function loadSanityBanners() {
-    const GROQ_QUERY = encodeURIComponent(`*[_type == "banner"]{
-        title,
-        "imageUrl": image.asset->url
-    }`);
-
-    const url = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${GROQ_QUERY}`;
-
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        const banners = data.result || [];
-
-        const track = document.getElementById('carousel-track');
-        const dotsContainer = document.getElementById('carousel-dots');
-
-        if (!track) return;
-
-        if (banners.length === 0) {
-            track.innerHTML = `
-                <div class="carousel-slide">
-                    <div class="carousel-caption">
-                        <h3>Belum ada banner</h3>
-                    </div>
-                </div>`;
-            if (dotsContainer) dotsContainer.innerHTML = '';
-            return;
-        }
-
-        // 1. Render Banner
-        track.innerHTML = banners.map(b => `
-            <div class="carousel-slide">
-                <img src="${b.imageUrl}" alt="${b.title || 'Banner SMI'}">
-                <div class="carousel-caption">
-                    <h3>${b.title || ''}</h3>
-                </div>
-            </div>
-        `).join('');
-
-        // 2. Render Dots Dinamis berdasarkan jumlah banner
-        if (dotsContainer) {
-            dotsContainer.innerHTML = banners.map((_, index) => `
-                <span class="dot ${index === 0 ? 'active' : ''}" onclick="currentSlide(${index})"></span>
-            `).join('');
-        }
-
-        // 3. Reset index & jalankan autoslide
-        slideIndex = 0;
-        showSlide(slideIndex);
-        startAutoSlide();
-
-    } catch (error) {
-        console.error('Gagal memuat banner dari Sanity:', error);
+        animatedElements.forEach(el => observer.observe(el));
     }
-}
 
-    </script>
+    // ================= LOGIKA BANNER CAROUSEL ================= //
+    function showSlide(index) {
+        const track = document.getElementById('carousel-track');
+        const slides = document.querySelectorAll('.carousel-slide');
+        const dots = document.querySelectorAll('.dot');
+
+        if (!track || slides.length === 0) return;
+
+        if (index >= slides.length) slideIndex = 0;
+        if (index < 0) slideIndex = slides.length - 1;
+
+        track.style.transform = `translateX(-${slideIndex * 100}%)`;
+
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === slideIndex);
+        });
+    }
+
+    function moveSlide(n) {
+        slideIndex += n;
+        showSlide(slideIndex);
+        resetAutoSlide();
+    }
+
+    function currentSlide(n) {
+        slideIndex = n;
+        showSlide(slideIndex);
+        resetAutoSlide();
+    }
+
+    function startAutoSlide() {
+        if (autoSlideTimer) clearInterval(autoSlideTimer);
+        autoSlideTimer = setInterval(() => {
+            slideIndex++;
+            showSlide(slideIndex);
+        }, 4000);
+    }
+
+    function resetAutoSlide() {
+        clearInterval(autoSlideTimer);
+        startAutoSlide();
+    }
+
+    async function loadSanityBanners() {
+        const GROQ_QUERY = encodeURIComponent(`*[_type == "banner"]{
+            title,
+            "imageUrl": image.asset->url
+        }`);
+
+        const url = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${GROQ_QUERY}`;
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            const banners = data.result || [];
+
+            const track = document.getElementById('carousel-track');
+            const dotsContainer = document.getElementById('carousel-dots');
+
+            if (!track) return;
+
+            if (banners.length === 0) {
+                track.innerHTML = `
+                    <div class="carousel-slide">
+                        <div class="carousel-caption">
+                            <h3>Belum ada banner</h3>
+                        </div>
+                    </div>`;
+                if (dotsContainer) dotsContainer.innerHTML = '';
+                return;
+            }
+
+            // 1. Render Banner Slide
+            track.innerHTML = banners.map(b => `
+                <div class="carousel-slide">
+                    <img src="${b.imageUrl}" alt="${b.title || 'Banner SMI'}">
+                    <div class="carousel-caption">
+                        <h3>${b.title || ''}</h3>
+                    </div>
+                </div>
+            `).join('');
+
+            // 2. Render Dots Dinamis berdasarkan jumlah banner yang ada
+            if (dotsContainer) {
+                dotsContainer.innerHTML = banners.map((_, index) => `
+                    <span class="dot ${index === 0 ? 'active' : ''}" onclick="currentSlide(${index})"></span>
+                `).join('');
+            }
+
+            // 3. Reset slideIndex & jalankan auto slide
+            slideIndex = 0;
+            showSlide(slideIndex);
+            startAutoSlide();
+
+        } catch (error) {
+            console.error('Gagal memuat banner dari Sanity:', error);
+        }
+    }
+
+    // ================= FETCH DATA UNIT ================= //
+    async function fetchUnit() {
+        const query = encodeURIComponent(`*[_type == "unit"]{namaSekolah, "slug": slug.current, tingkat}`);
+        const url = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${query}`;
+
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+            const units = data.result || [];
+
+            const loadingEl = document.getElementById('loading-unit');
+            if(loadingEl) loadingEl.style.display = 'none';
+
+            const container = document.getElementById('unit-container');
+
+            if (units.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#777;">Belum ada data unit. Isi via Dashboard Sanity.</p>';
+                return;
+            }
+
+            const dikelompokkan = {};
+            units.forEach(u => {
+                const tingkatKey = u.tingkat || 'Umum';
+                if(!dikelompokkan[tingkatKey]) dikelompokkan[tingkatKey] = [];
+                dikelompokkan[tingkatKey].push(u);
+            });
+
+            const urutanTingkat = ['SD', 'SMP', 'SMA', 'Umum'];
+
+            urutanTingkat.forEach(tingkat => {
+                const list = dikelompokkan[tingkat];
+                if (!list) return;
+
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'unit-group anim-up';
+                groupDiv.innerHTML = `
+                    <h3>Tingkat ${tingkat}</h3>
+                    <ul class="unit-list">
+                        ${list.map(item => `
+                            <li>
+                                <a href="unit.html?slug=${item.slug}">
+                                    📍 ${item.namaSekolah}
+                                </a>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                container.appendChild(groupDiv);
+            });
+
+            initScrollObserver();
+
+        } catch (e) {
+            const loadingEl = document.getElementById('loading-unit');
+            if(loadingEl) loadingEl.innerText = 'Gagal memuat data unit.';
+        }
+    }
+
+    // ================= FETCH DATA PRESTASI ================= //
+    async function fetchPrestasi() {
+        const query = encodeURIComponent(`*[_type == "prestasi"] | order(_createdAt desc)[0...10]{
+            namaAtlet,
+            kejuaraan,
+            asalUnit,
+            "fotoUrl": fotoAtlet.asset->url
+        }`);
+
+        const url = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${query}`;
+
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+            const prestasis = data.result || [];
+
+            const container = document.getElementById('prestasi-container');
+
+            if (prestasis.length === 0) {
+                container.innerHTML = '<p style="text-align:center; width:100%; color:#777;">Belum ada data prestasi.</p>';
+                return;
+            }
+
+            const cardsHTML = prestasis.map(p => `
+                <div class="card-prestasi">
+                    <img src="${p.fotoUrl || 'https://via.placeholder.com/150'}" alt="${p.namaAtlet}">
+                    <div class="card-info">
+                        <h4>${p.namaAtlet}</h4>
+                        <p>${p.kejuaraan}</p>
+                        <p class="unit-tag">📍 ${p.asalUnit || '-'}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = cardsHTML + cardsHTML + cardsHTML;
+
+            startAutoScroll(container);
+
+        } catch (e) {
+            document.getElementById('prestasi-container').innerHTML =
+                '<p style="text-align:center; width:100%;">Gagal memuat prestasi.</p>';
+            console.error(e);
+        }
+    }
+
+    function startAutoScroll(container) {
+        if (autoScrollInterval) clearInterval(autoScrollInterval);
+
+        const speed = 1;
+
+        autoScrollInterval = setInterval(() => {
+            container.scrollLeft += speed;
+
+            if (container.scrollLeft >= (container.scrollWidth / 3) * 2) {
+                container.scrollLeft = container.scrollLeft - (container.scrollWidth / 3);
+            }
+        }, 20);
+    }
+
+    // ================= JALANKAN SAAT DOM READY ================= //
+    document.addEventListener('DOMContentLoaded', () => {
+        initScrollObserver();
+        loadSanityBanners(); // Memuat banner & merender dots dinamis
+        fetchUnit();
+        fetchPrestasi();
+    });
+</script>
 </body>
 </html>
