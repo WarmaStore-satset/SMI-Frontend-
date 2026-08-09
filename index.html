@@ -474,10 +474,10 @@
         <p>Komwil Kota Serang</p>
     </header>
 
-<!-- BANNER CAROUSEL (Dinamis dari Sanity) -->
+<!-- BANNER CAROUSEL -->
 <section class="section" style="padding-bottom: 10px;">
     <div class="carousel-container-box">
-        <!-- Kosongkan bagian track ini, JS yang akan mengisi slidenya -->
+        <!-- Track Gambar -->
         <div id="carousel-track" class="carousel-track">
             <div class="carousel-slide">
                 <div class="carousel-caption">
@@ -485,6 +485,17 @@
                 </div>
             </div>
         </div>
+
+        <!-- Tombol Panah (Di dalam box) -->
+        <button class="carousel-btn prev-btn" onclick="moveSlide(-1)">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button class="carousel-btn next-btn" onclick="moveSlide(1)">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <!-- Container Dots (Akan diisi otomatis oleh JS) -->
+        <div id="carousel-dots" class="carousel-dots"></div>
     </div>
 </section>
 
@@ -782,58 +793,61 @@
             fetchPrestasi();
         });
 
-    async function loadSanityBanners() {
-        const PROJECT_ID = 'r6yz1q11';
-        const DATASET = 'production';
-        
-        // Query GROQ disesuaikan dengan field "title" dan "image"
-        const GROQ_QUERY = encodeURIComponent(`*[_type == "banner"]{
-            title,
-            "imageUrl": image.asset->url
-        }`);
+async function loadSanityBanners() {
+    const GROQ_QUERY = encodeURIComponent(`*[_type == "banner"]{
+        title,
+        "imageUrl": image.asset->url
+    }`);
 
-        const url = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${GROQ_QUERY}`;
+    const url = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${GROQ_QUERY}`;
 
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-            const banners = data.result;
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const banners = data.result || [];
 
-            const track = document.getElementById('carousel-track');
+        const track = document.getElementById('carousel-track');
+        const dotsContainer = document.getElementById('carousel-dots');
 
-            if (!banners || banners.length === 0) {
-                track.innerHTML = `
-                    <div class="carousel-slide">
-                        <div class="carousel-caption">
-                            <h3>Belum ada banner</h3>
-                        </div>
-                    </div>`;
-                return;
-            }
+        if (!track) return;
 
-            // Render ulang slide berdasarkan data dari Sanity
-            track.innerHTML = banners.map(b => `
+        if (banners.length === 0) {
+            track.innerHTML = `
                 <div class="carousel-slide">
-                    <img src="${b.imageUrl}" alt="${b.title || 'Banner SMI'}">
                     <div class="carousel-caption">
-                        <h3>${b.title || ''}</h3>
+                        <h3>Belum ada banner</h3>
                     </div>
-                </div>
-            `).join('');
-
-            // Panggil kembali fungsi animasi carousel lama (jika ada)
-            if (typeof initCarouselAnimation === 'function') {
-                initCarouselAnimation();
-            }
-
-        } catch (error) {
-            console.error('Gagal memuat banner dari Sanity:', error);
+                </div>`;
+            if (dotsContainer) dotsContainer.innerHTML = '';
+            return;
         }
-    }
 
-    // Jalankan saat halaman selesai dimuat
-    document.addEventListener('DOMContentLoaded', loadSanityBanners);
-</script>
+        // 1. Render Banner
+        track.innerHTML = banners.map(b => `
+            <div class="carousel-slide">
+                <img src="${b.imageUrl}" alt="${b.title || 'Banner SMI'}">
+                <div class="carousel-caption">
+                    <h3>${b.title || ''}</h3>
+                </div>
+            </div>
+        `).join('');
+
+        // 2. Render Dots Dinamis berdasarkan jumlah banner
+        if (dotsContainer) {
+            dotsContainer.innerHTML = banners.map((_, index) => `
+                <span class="dot ${index === 0 ? 'active' : ''}" onclick="currentSlide(${index})"></span>
+            `).join('');
+        }
+
+        // 3. Reset index & jalankan autoslide
+        slideIndex = 0;
+        showSlide(slideIndex);
+        startAutoSlide();
+
+    } catch (error) {
+        console.error('Gagal memuat banner dari Sanity:', error);
+    }
+}
 
     </script>
 </body>
