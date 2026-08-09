@@ -474,33 +474,19 @@
         <p>Komwil Kota Serang</p>
     </header>
 
-
-    <!-- BANNER CAROUSEL (3 Slide Landscape) -->
-    <section class="section" style="padding-bottom: 10px;">
-        <div class="carousel-container-box">
-            <div id="carousel-track" class="carousel-track">
-                <!-- Slide 1 -->
-                <div class="carousel-slide">
-                    <img src="LOGOSMI.jpeg" alt="Kegiatan 1">
-                    <div class="carousel-caption">
-                        <h3>Latihan Gabungan SMI Komwil Kota Serang</h3>
-                    </div>
-                </div>
-                <!-- Slide 2 -->
-                <div class="carousel-slide">
-                    <img src="LOGOSMI.jpeg" alt="Kegiatan 2">
-                    <div class="carousel-caption">
-                        <h3>Pembinaan Atlet Berbakat & Berprestasi</h3>
-                    </div>
-                </div>
-                <!-- Slide 3 -->
-                <div class="carousel-slide">
-                    <img src="LOGOSMI.jpeg" alt="Kegiatan 3">
-                    <div class="carousel-caption">
-                        <h3>Pencak Silat Satria Muda Indonesia</h3>
-                    </div>
+<!-- BANNER CAROUSEL (Dinamis dari Sanity) -->
+<section class="section" style="padding-bottom: 10px;">
+    <div class="carousel-container-box">
+        <!-- Kosongkan bagian track ini, JS yang akan mengisi slidenya -->
+        <div id="carousel-track" class="carousel-track">
+            <div class="carousel-slide">
+                <div class="carousel-caption">
+                    <h3>Memuat banner...</h3>
                 </div>
             </div>
+        </div>
+    </div>
+</section>
 
             <!-- Tombol Panah Kiri & Kanan (Manual) -->
             <button class="carousel-btn prev-btn" onclick="moveSlide(-1)"><i class="fa-solid fa-chevron-left"></i></button>
@@ -795,6 +781,59 @@
             fetchUnit();
             fetchPrestasi();
         });
+
+    async function loadSanityBanners() {
+        const PROJECT_ID = 'r6yz1q11';
+        const DATASET = 'production';
+        
+        // Query GROQ untuk mengambil semua data dari schema 'banner'
+        const GROQ_QUERY = encodeURIComponent(`*[_type == "banner"]{
+            judul,
+            "imageUrl": fotoBanner.asset->url
+        }`);
+
+        const url = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${GROQ_QUERY}`;
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            const banners = data.result;
+
+            const track = document.getElementById('carousel-track');
+
+            if (!banners || banners.length === 0) {
+                track.innerHTML = `
+                    <div class="carousel-slide">
+                        <div class="carousel-caption">
+                            <h3>Belum ada banner tersedia</h3>
+                        </div>
+                    </div>`;
+                return;
+            }
+
+            // Render ulang slide berdasarkan data dari Sanity
+            track.innerHTML = banners.map(b => `
+                <div class="carousel-slide">
+                    <img src="${b.imageUrl}" alt="${b.judul || 'Banner SMI'}">
+                    <div class="carousel-caption">
+                        <h3>${b.judul || ''}</h3>
+                    </div>
+                </div>
+            `).join('');
+
+            // Inisialisasi ulang fungsi/slider animasi carousel kamu jika ada
+            if (typeof initCarouselAnimation === 'function') {
+                initCarouselAnimation();
+            }
+
+        } catch (error) {
+            console.error('Gagal memuat banner dari Sanity:', error);
+        }
+    }
+
+    // Jalankan fungsi saat halaman selesai di-load
+    document.addEventListener('DOMContentLoaded', loadSanityBanners);
+    
     </script>
 </body>
 </html>
